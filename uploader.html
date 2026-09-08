@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Subir trabajos - Vegvisir Barber Shop</title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header"><div class="container"><h1 class="logo">Vegvisir Barber Shop</h1></div></header>
+  <main class="container">
+    <h2>Subir trabajos</h2>
+    <p>Usuario: <span id="currentUser"></span></p>
+    <form id="uploadForm">
+      <label>Selecciona imágenes (máx 6)<input id="fileInput" type="file" accept="image/*" multiple required></label>
+      <button class="btn">Subir</button>
+    </form>
+    <p>Las imágenes se guardan localmente (demo). Para subida real integraría Supabase Storage.</p>
+  </main>
+  <script src="scripts.js"></script>
+</body>
+</html>

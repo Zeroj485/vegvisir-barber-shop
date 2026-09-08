@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Equipo - Vegvisir Barber Shop</title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header"><div class="container"><h1 class="logo">Vegvisir Barber Shop</h1><nav><a href="index.html">Inicio</a> <a href="servicios.html">Servicios</a> <a href="galeria.html">Galería</a> <a href="contacto.html">Contacto</a></nav></div></header>
+  <main class="container">
+    <h2>Nuestro equipo</h2>
+    <div class="team">
+      <div class="member"><img src="https://via.placeholder.com/200" alt="Alejandro"><h4>Alejandro</h4><p>Especialista en cortes clásicos</p><a class="btn" href="#" onclick="openBarber('alejandro')">Reservar</a> <a class="btn outline" href="galeria.html#alejandro">Ver trabajos</a></div>
+      <div class="member"><img src="https://via.placeholder.com/200" alt="Barbero2"><h4>Barbero2</h4><p>Estilos modernos</p><a class="btn" href="#" onclick="openBarber('barbero2')">Reservar</a> <a class="btn outline" href="galeria.html#barbero2">Ver trabajos</a></div>
+      <div class="member"><img src="https://via.placeholder.com/200" alt="Barbero3"><h4>Barbero3</h4><p>Barbas y detalles</p><a class="btn" href="#" onclick="openBarber('barbero3')">Reservar</a> <a class="btn outline" href="galeria.html#barbero3">Ver trabajos</a></div>
+      <div class="member"><img src="https://via.placeholder.com/200" alt="Barbero4"><h4>Barbero4</h4><p>Tendencias</p><a class="btn" href="#" onclick="openBarber('barbero4')">Reservar</a> <a class="btn outline" href="galeria.html#barbero4">Ver trabajos</a></div>
+      <div class="member"><img src="https://via.placeholder.com/200" alt="Barbero5"><h4>Barbero5</h4><p>Acabados</p><a class="btn" href="#" onclick="openBarber('barbero5')">Reservar</a> <a class="btn outline" href="galeria.html#barbero5">Ver trabajos</a></div>
+    </div>
+  </main>
+  <script src="scripts.js"></script>
+  <script>
+    function openBarber(id){
+      // open modal on index (simple nav)
+      window.location.href = 'index.html#'+id;
+      // better UX: open reservation modal with barber selected
+    }
+  </script>
+</body>
+</html>
