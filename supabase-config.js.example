@@ -1,0 +1,9 @@
+// supabase-config.js.example
+// Create a file named `supabase-config.js` (DO NOT commit it to the repo) and paste your keys there:
+
+// window.SUPABASE_CONFIG = {
+//   SUPABASE_URL: 'https://your-project.supabase.co',
+//   SUPABASE_ANON_KEY: 'public-anon-key'
+// };
+
+// Then reload the site. The frontend will detect this config and enable Supabase features.
