@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- carabela-barbera-bolchevique.svg: ilustración simple de una carabela con motivos de barbería y un personaje con gorra roja (bolchevique) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Carabela barbera con un bolchevique">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#a0d8ff" />
+      <stop offset="100%" stop-color="#79bfff" />
+    </linearGradient>
+    <linearGradient id="waterGrad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0e6ea8" />
+      <stop offset="100%" stop-color="#054e78" />
+    </linearGradient>
+    <pattern id="barberStripes" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(20)">
+      <rect width="12" height="12" fill="#fff" />
+      <rect x="0" y="0" width="6" height="12" fill="#d32f2f" />
+      <rect x="6" y="0" width="6" height="12" fill="#0b6cf3" />
+    </pattern>
+  </defs>
+
+  <!-- Sky -->
+  <rect x="0" y="0" width="1200" height="800" fill="url(#skyGrad)" />
+
+  <!-- Sun -->
+  <circle cx="980" cy="120" r="60" fill="#ffd86b" opacity="0.9" />
+
+  <!-- Water -->
+  <rect x="0" y="420" width="1200" height="380" fill="url(#waterGrad)" />
+  <!-- gentle waves -->
+  <g fill="#0a5a86" opacity="0.2">
+    <ellipse cx="200" cy="520" rx="300" ry="18" />
+    <ellipse cx="600" cy="560" rx="420" ry="22" />
+    <ellipse cx="1000" cy="520" rx="300" ry="18" />
+  </g>
+
+  <!-- Ship hull -->
+  <g transform="translate(200,320)">
+    <path d="M60 220 L520 220 Q540 220 560 200 L620 120 Q640 100 620 80 L80 80 Q40 80 20 120 L60 220 Z" fill="#5a3821" stroke="#3b2616" stroke-width="4"/>
+    <rect x="120" y="40" width="320" height="60" rx="10" fill="#6d4328" stroke="#3b2616" stroke-width="3"/>
+  </g>
+
+  <!-- Mast and sails -->
+  <g transform="translate(340,140)">
+    <rect x="-8" y="-20" width="16" height="260" rx="8" fill="#4a362b" />
+    <!-- big sail with barber pole pattern -->
+    <path d="M0 0 C140 20 220 120 260 220 L-40 220 C-10 120 0 20 0 0 Z" fill="url(#barberStripes)" stroke="#333" stroke-width="2"/>
+    <!-- smaller sail -->
+    <path d="M0 60 C60 80 100 120 120 180 L-20 180 C-5 120 0 80 0 60 Z" fill="#fff" opacity="0.9" />
+  </g>
+
+  <!-- Deck details: barber pole flag -->
+  <g transform="translate(560,100)">
+    <rect x="0" y="0" width="140" height="20" rx="6" fill="url(#barberStripes)" stroke="#222" stroke-width="2"/>
+    <text x="70" y="14" font-size="12" text-anchor="middle" fill="#fff" font-family="Arial">BARBERA</text>
+  </g>
+
+  <!-- Figure on deck (bolchevique-like character with red cap) -->
+  <g transform="translate(420,220)">
+    <!-- body -->
+    <ellipse cx="0" cy="60" rx="32" ry="40" fill="#2d2d2d" />
+    <!-- head -->
+    <circle cx="0" cy="10" r="26" fill="#f2d6b3" stroke="#caa68a" stroke-width="2" />
+    <!-- red cap -->
+    <path d="M-22 -6 C-22 -18 22 -18 22 -6 L22 4 C-6 -2 -6 -2 -22 4 Z" fill="#c62828" />
+    <!-- moustache -->
+    <path d="M-10 16 Q-6 22 0 20 Q6 22 10 16" stroke="#6b3b2b" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- scarf with a star (subtle nod, not political messaging) -->
+    <rect x="-28" y="36" width="56" height="12" rx="6" fill="#8b0000" />
+    <polygon points="0,40 3,46 9,47 4,51 6,57 0,53 -6,57 -4,51 -9,47 -3,46" fill="#ffd700" opacity="0.9"/>
+  </g>
+
+  <!-- decorative barber pole on bow -->
+  <g transform="translate(180,360)">
+    <rect x="0" y="-80" width="14" height="120" rx="7" fill="url(#barberStripes)" stroke="#222"/>
+    <circle cx="7" cy="-86" r="12" fill="#ffd86b" />
+  </g>
+
+  <!-- small text signature -->
+  <text x="30" y="760" font-size="14" fill="#ffffffaa" font-family="Arial">Ilustración: Carabela barbera — estilo vectorial</text>
+</svg>
