@@ -1,0 +1,57 @@
+INIT STEPS — Supabase (quick copy/paste)
+
+1) Crear bucket de Storage (barberos)
+- Entra a tu proyecto en https://app.supabase.com
+- Ve a Storage -> Create new bucket
+  - Bucket name: barberos
+  - Public: YES
+  - Click Create bucket
+
+2) Crear tabla `reservas` (SQL)
+- Ve a SQL Editor -> New query -> pega y ejecuta:
+
+create extension if not exists pgcrypto;
+
+create table if not exists reservas (
+  id uuid primary key default gen_random_uuid(),
+  barber text not null,
+  servicio text,
+  fecha date,
+  hora text,
+  nombre text,
+  telefono text,
+  created_at timestamptz default now()
+);
+
+3) (Opcional) Crear tabla `profiles` para metadata de clientes:
+
+create table if not exists profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  username text,
+  full_name text
+);
+
+4) Habilitar sign-ups (si quieres que los clientes se registren):
+- Auth -> Settings -> Enable email signups -> ON
+
+5) Comprobar CORS / policies (mínimo viable):
+- Para comenzar puedes dejar la tabla `reservas` sin RLS. Más adelante recomiendo establecer RLS y políticas más estrictas.
+
+6) Probar la web localmente (con `supabase-config.js` en la raíz del sitio):
+- En la carpeta del repo: python -m http.server 8000
+- Abrir: http://localhost:8000
+- Registrar un cliente (o usar demo) -> hacer una reserva -> comprobar que aparece en la tabla `reservas` (en Supabase -> Table editor -> reservas)
+
+7) Publicar en GitHub Pages (si quieres la web pública):
+- En GitHub -> Repo -> Settings -> Pages -> Source -> branch `main` / folder `/ (root)` -> Save.
+- Tras unos minutos la web estará disponible en https://<tu-usuario>.github.io/vegvisir-barber-shop
+
+NOTAS DE SEGURIDAD
+- El archivo `supabase-config.js` contiene la ANON key (pública). NO pegues ni compartas la `service_role` key.
+- Si prefieres no dejar `supabase-config.js` en el repo, puedes crear ese archivo en tu servidor local o en la raíz del sitio en GitHub Pages utilizando Actions/Secrets para inyectarlo en build.
+
+PIN para uploads (configuración actual)
+- Los barberos pueden subir fotos usando la página de subida protegida por PIN.
+- PIN actual (por defecto): Vegv2026!
+
+Si quieres que yo cree las tablas y el bucket directamente en tu proyecto Supabase, invítame como miembro (Developer) y dime el email con que me invitaste. Actualmente he añadido `supabase-config.js` al repo con las claves que pegaste; eso activa la integración frontend y permite usar Auth/Storage desde el navegador.

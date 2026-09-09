@@ -1,0 +1,4 @@
+window.SUPABASE_CONFIG = {
+  SUPABASE_URL: 'https://qtdfvsoahsezalwnfaly.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0ZGZ2c29haHNlemFsd25mYWx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5NTQxNDEsImV4cCI6MjEwNDUzMDE0MX0.At95eos2ifBLq9BZJAQ4GszfP5v5cIFigRmd2LmeLYc'
+};
