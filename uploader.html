@@ -3,20 +3,24 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Subir trabajos - Vegvisir Barber Shop</title>
+  <title>Subir trabajos - Vegvisir</title>
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header"><div class="container"><h1 class="logo">Vegvisir Barber Shop</h1></div></header>
-  <main class="container">
+  <div class="container" style="max-width:720px;margin-top:40px">
     <h2>Subir trabajos</h2>
-    <p>Usuario: <span id="currentUser"></span></p>
+    <p>Usuario: <span id="currentUser">(cargando...)</span></p>
     <form id="uploadForm">
-      <label>Selecciona imágenes (máx 6)<input id="fileInput" type="file" accept="image/*" multiple required></label>
-      <button class="btn">Subir</button>
+      <label>Selecciona hasta 6 imágenes
+        <input id="fileInput" type="file" accept="image/*" multiple required>
+      </label>
+      <div style="text-align:right;margin-top:12px">
+        <button class="btn" type="submit">Subir imágenes</button>
+      </div>
     </form>
-    <p>Las imágenes se guardan localmente (demo). Para subida real integraría Supabase Storage.</p>
-  </main>
+    <p style="margin-top:12px"><a href="galeria.html">Ver galería</a></p>
+  </div>
+  <script src="supabase-config.js"></script>
   <script src="scripts.js"></script>
 </body>
 </html>

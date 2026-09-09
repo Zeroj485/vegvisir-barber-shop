@@ -3,20 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login - Vegvisir Barber Shop</title>
+  <title>Entrar - Vegvisir</title>
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header"><div class="container"><h1 class="logo">Vegvisir Barber Shop</h1></div></header>
-  <main class="container">
-    <h2>Ingreso barberos (demo)</h2>
+  <div class="container" style="max-width:520px;margin-top:40px">
+    <h2>Iniciar sesión</h2>
     <form id="loginForm">
-      <label>Usuario<input id="userInput" required></label>
-      <label>Contraseña<input id="passInput" type="password" required></label>
-      <button class="btn">Entrar</button>
+      <label>Email o usuario
+        <input id="userInput" placeholder="ej: alejandro@vegvisir.local o alejandro" required>
+      </label>
+      <label>Contraseña
+        <input type="password" id="passInput" required>
+      </label>
+      <div style="text-align:right;margin-top:12px">
+        <button class="btn" type="submit">Entrar</button>
+      </div>
     </form>
-    <p>Usuarios demo: alejandro, barbero2, barbero3, barbero4, barbero5 — contraseña: Vegv2026!</p>
-  </main>
+    <p style="margin-top:14px">¿No tienes cuenta? <a href="signup.html">Regístrate</a></p>
+  </div>
+  <script src="supabase-config.js"></script>
   <script src="scripts.js"></script>
 </body>
 </html>
