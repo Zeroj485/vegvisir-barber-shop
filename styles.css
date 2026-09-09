@@ -1,50 +1,64 @@
-/* Improved styling for Vegvisir Barber Shop */
+/* styles.css — updated to use Vegvisir background and a high-contrast monochrome theme that matches the uploaded logo/bg
+   - Expects a background image at assets/vegvisir-bg.jpg (or .png). If you want me to add the exact image file to the repo, súbela o dime y la añado.
+*/
 :root{
-  --bg:#0b1220;
-  --card:#0f1723;
-  --accent:#0B6CF3;
-  --muted:#9fb4d9;
-  --text:#e6eef8;
-  --glass: rgba(255,255,255,0.04);
+  --bg-overlay-color: rgba(3,6,10,0.72);
+  --bg:#08090a; /* fallback solid background */
+  --card: rgba(18,20,22,0.72);
+  --accent:#d32f2f; /* barbershop red accent */
+  --muted:#cfd8e3;
+  --text:#f3f6f9;
+  --glass: rgba(255,255,255,0.03);
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;color:var(--text);background:var(--bg)}
-.with-bg{background-image: url('https://source.unsplash.com/1600x900/?small-barbershop,barbershop,barbers,team');background-size:cover;background-position:center;background-attachment:fixed}
-.bg-overlay{position:fixed;inset:0;background:linear-gradient(180deg, rgba(7,10,24,0.65), rgba(4,6,12,0.75));pointer-events:none}
+html,body{height:100%}
+body{
+  margin:0;font-family:Inter,system-ui,Arial,sans-serif;color:var(--text);
+  background-color:var(--bg);
+  /* background image: replace assets/vegvisir-bg.jpg with the file you uploaded */
+  background-image: url('assets/vegvisir-bg.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position:relative;
+}
+/* subtle dark overlay so content stays readable on bright backgrounds */
+.bg-overlay{position:fixed;inset:0;background:linear-gradient(180deg, rgba(3,6,10,0.55), rgba(3,6,10,0.75));pointer-events:none}
 .container{max-width:1100px;margin:0 auto;padding:24px;position:relative}
-.site-header{position:relative;backdrop-filter:blur(6px);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-bottom:1px solid rgba(255,255,255,0.03)}
+.site-header{position:relative;backdrop-filter:blur(6px);background:linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.02));border-bottom:1px solid rgba(255,255,255,0.03)}
 .site-header .container{display:flex;align-items:center;justify-content:space-between}
-.logo{margin:10px 0;color:var(--accent);font-weight:700}
+.logo{margin:10px 0;color:var(--accent);font-weight:800;letter-spacing:1px}
 nav a{margin-left:12px;color:var(--text);text-decoration:none}
 nav a.btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:8px}
 nav a.outline{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:6px 10px;border-radius:8px}
 .hero{padding:64px 0;text-align:center}
-.hero h2{font-size:36px;margin:0 0 8px;color:var(--text)}
+.hero h2{font-size:36px;margin:0 0 8px;color:var(--text);text-shadow:0 2px 10px rgba(0,0,0,0.6)}
 .hero p{color:var(--muted);margin:0 0 18px}
-.btn{display:inline-block;background:var(--accent);color:#fff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:600}
+.btn{display:inline-block;background:var(--accent);color:#fff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:700}
 .btn.outline{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
 .btn.small{padding:6px 10px;font-size:14px}
 .cards{display:flex;gap:18px;flex-wrap:wrap}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.6);flex:1;min-width:220px;border:1px solid rgba(255,255,255,0.03)}
-.card h4{margin:0 0 8px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);flex:1;min-width:220px;border:1px solid rgba(255,255,255,0.03)}
+.card h4{margin:0 0 8px;color:var(--text)}
 .card p{margin:0;color:var(--muted)}
 .team{display:flex;gap:18px;flex-wrap:wrap}
-.member{background:var(--card);padding:14px;border-radius:12px;width:200px;text-align:center;border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column;align-items:center}
-.member img{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px}
-.member h4{margin:6px 0 4px}
+.member{background:rgba(0,0,0,0.45);padding:14px;border-radius:12px;width:200px;text-align:center;border:1px solid rgba(255,255,255,0.04);display:flex;flex-direction:column;align-items:center}
+.member img{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:10px;border:4px solid rgba(255,255,255,0.04)}
+.member h4{margin:6px 0 4px;color:var(--text);font-size:18px}
 .member p{margin:0;color:var(--muted);font-size:14px}
 .site-footer{padding:30px 0;text-align:center;color:var(--muted)}
-.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.8))}
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.85))}
 .modal[aria-hidden="false"]{display:flex}
 .modal-content{position:relative;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;max-width:520px;width:92%;border:1px solid rgba(255,255,255,0.03)}
 .modal-close{position:absolute;right:12px;top:8px;background:transparent;border:0;font-size:28px;color:var(--text);cursor:pointer}
 label{display:block;margin:10px 0;color:var(--muted)}
-input,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--text)}
+input,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
 .modal-actions{text-align:right;margin-top:12px}
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .thumb{width:100%;height:120px;object-fit:cover;border-radius:6px}
 .services-list{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
 .service-item{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;min-width:200px;border:1px solid rgba(255,255,255,0.03)}
 .service-item h4{margin:0 0 6px}
-.service-price{font-weight:700;color:var(--accent)}
+.service-price{font-weight:800;color:var(--accent)}
 @media(max-width:760px){.cards{flex-direction:column}.team{justify-content:center}.member{width:46%}.services-list{flex-direction:column}}
