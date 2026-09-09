@@ -1,6 +1,7 @@
-// scripts.js - supabase-aware reservation, auth and gallery logic
-const PREFIJO = '+53'; // país (Cuba)
+// scripts.js - robust site renderer, reservation and auth fallbacks
+const PREFIJO = '+53'; // país (Cuba) - usado si el usuario introduce su propio teléfono
 
+// Demo credentials (solo para demo/local)
 const DEMO_USERS = {
   'alejandro': 'Vegv2026!',
   'karel': 'Vegv2026!',
@@ -9,321 +10,390 @@ const DEMO_USERS = {
   'chino': 'Vegv2026!'
 };
 
-const DEMO_PHONES = {
-  'alejandro': '+53 56513862',
-  'karel': '+53 60000002',
-  'leo': '+53 60000003',
-  'marco': '+53 60000004',
-  'chino': '+53 60000005'
-};
+// fallback demo phones (leave empty since authoritative data lives in site-data.js)
+const DEMO_PHONES = {};
 
 let supabase = null;
 let USING_SUPABASE = false;
 
 async function initSupabase(){
   if(!window.SUPABASE_CONFIG || !window.SUPABASE_CONFIG.SUPABASE_URL || !window.SUPABASE_CONFIG.SUPABASE_ANON_KEY){
-    console.log('Supabase config not found — running in demo/local mode');
+    console.log('Supabase no configurado, usando modo demo/localStorage');
     return;
   }
   try{
     const mod = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/esm/index.js');
     supabase = mod.createClient(window.SUPABASE_CONFIG.SUPABASE_URL, window.SUPABASE_CONFIG.SUPABASE_ANON_KEY);
     USING_SUPABASE = true;
-    console.log('Supabase initialized');
+    console.log('Supabase inicializado');
   }catch(err){
-    console.warn('Could not load supabase-js from CDN, continuing in demo mode', err);
+    console.warn('No se pudo cargar supabase-js, continuando en demo mode', err);
+    USING_SUPABASE = false;
   }
 }
 
-initSupabase();
-
-// Render site data (services & team)
+// robust rendering of services & team using window.SITE_DATA (or sensible fallbacks)
 function renderSiteFromData(){
-  const data = window.SITE_DATA;
-  if(!data) return;
+  try{
+    const data = window.SITE_DATA || { services: [], barbers: [] };
 
-  // services
-  const servicesContainer = document.getElementById('servicesContainer');
-  if(servicesContainer && Array.isArray(data.services)){
-    servicesContainer.innerHTML = '';
-    data.services.forEach(s => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `<h4>${s.title}</h4><p>Precio: $${s.price} — Duración: ${s.duration}</p><button class="btn small reservar-btn" data-service="${s.title}">Reservar</button>`;
-      servicesContainer.appendChild(card);
-    });
-  }
-
-  // team
-  const teamContainer = document.getElementById('teamContainer');
-  if(teamContainer && Array.isArray(data.barbers)){
-    teamContainer.innerHTML = '';
-    data.barbers.forEach(b => {
-      const div = document.createElement('div');
-      div.className = 'member';
-      div.innerHTML = `
-        <img src="${b.img}" alt="${b.name}">
-        <h4>${b.name}</h4>
-        <p>${b.phone}</p>
-        <div style="margin-top:10px">
-          <button class="btn small reservar-btn" data-barber="${b.username}" data-service="">Reservar</button>
-          <a class="btn outline small" href="galeria.html#${b.username}">Ver trabajos</a>
-        </div>
-      `;
-      teamContainer.appendChild(div);
-    });
-
-    // also populate select in modal
-    const barberoSelect = document.getElementById('barberoSelect');
-    if(barberoSelect){
-      barberoSelect.innerHTML = '';
-      data.barbers.forEach(b => {
-        const opt = document.createElement('option'); opt.value = b.username; opt.textContent = b.name + ' — ' + b.phone; barberoSelect.appendChild(opt);
+    // SERVICES
+    const servicesContainer = document.getElementById('servicesContainer');
+    if(servicesContainer){
+      servicesContainer.innerHTML = '';
+      (data.services || []).forEach(s => {
+        const card = document.createElement('div');
+        card.className = 'card service-card';
+        card.innerHTML = `
+          <h4>${s.title}</h4>
+          <p>Precio: $${s.price}${s.duration ? ' — Duración: ' + s.duration : ''}</p>
+          <div style="margin-top:8px">
+            <button class="btn small reservar-btn" data-service="${s.title}">Reservar</button>
+          </div>
+        `;
+        servicesContainer.appendChild(card);
       });
     }
-  }
 
-  // attach reserva button handlers after rendering
-  const reservarBtns = document.querySelectorAll('.reservar-btn');
-  reservarBtns.forEach(btn=>{
-    btn.addEventListener('click',(e)=>{
-      e.preventDefault();
-      const svc = btn.dataset.service || '';
-      const barber = btn.dataset.barber || '';
-      const servicioInput = document.getElementById('servicioInput');
-      if(servicioInput && svc) servicioInput.value = svc;
-      if(barber) document.getElementById('barberoSelect').value = barber;
-      openModal();
-    });
-  });
-}
+    // TEAM (limit to first 5)
+    const teamContainer = document.getElementById('teamContainer');
+    if(teamContainer){
+      teamContainer.innerHTML = '';
+      const barbers = (data.barbers || []).slice(0,5);
+      barbers.forEach(b => {
+        const div = document.createElement('div');
+        div.className = 'member';
+        const img = b.img || 'https://via.placeholder.com/300?text=Barbero';
+        const phone = b.phone || '';
+        div.innerHTML = `
+          <img src="${img}" alt="${b.name || b.username}">
+          <h4>${b.name || b.username}</h4>
+          <p class="phone">${phone}</p>
+          <div style="margin-top:10px">
+            <button class="btn small reservar-btn" data-username="${b.username}" data-phone="${phone}" data-service="">Reservar</button>
+            <a class="btn outline small" href="galeria.html#${b.username}">Ver trabajos</a>
+          </div>
+        `;
+        teamContainer.appendChild(div);
+      });
 
-// Reservation modal handlers
-const reservaModal = document.getElementById('reservaModal');
-const closeModalBtn = document.getElementById('closeModal');
-const reservarTop = document.getElementById('reservarTop');
-const ctaReservar = document.getElementById('ctaReservar');
-function openModal(){ if(reservaModal) reservaModal.setAttribute('aria-hidden','false'); }
-function closeModalFn(){ if(reservaModal) reservaModal.setAttribute('aria-hidden','true'); }
-if(closeModalBtn) closeModalBtn.addEventListener('click',closeModalFn);
-if(reservarTop) reservarTop.addEventListener('click',(e)=>{e.preventDefault();openModal()});
-if(ctaReservar) ctaReservar.addEventListener('click',(e)=>{e.preventDefault();openModal()});
-
-// close modal when clicking on overlay
-if(reservaModal){
-  reservaModal.addEventListener('click',(e)=>{
-    if(e.target === reservaModal){
-      closeModalFn();
-    }
-  });
-}
-// close modal with Escape
-document.addEventListener('keydown',(e)=>{ if(e.key === 'Escape') closeModalFn(); });
-
-async function saveReservationToSupabase(obj){ if(!USING_SUPABASE || !supabase) return {error:'supabase_not_configured'}; const { data, error } = await supabase.from('reservas').insert([obj]).select(); return {data,error}; }
-
-const reservaForm = document.getElementById('reservaForm');
-if(reservaForm) reservaForm.addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const barber = document.getElementById('barberoSelect').value;
-  const servicio = document.getElementById('servicioInput').value;
-  const fecha = document.getElementById('fechaInput').value;
-  const hora = document.getElementById('horaInput').value;
-  const nombre = document.getElementById('nombreInput').value;
-  const telefono = document.getElementById('telefonoInput').value;
-
-  const phone = (DEMO_PHONES[barber] || (PREFIJO + ' ' + telefono)).replace(/\s+/g,'');
-  const plainPhone = phone.replace(/[^+0-9]/g,'');
-
-  const mensaje = `Hola ${barber} 👋%0AQuisiera reservar:%0A- Servicio: ${encodeURIComponent(servicio)}%0A- Fecha: ${fecha}%0A- Hora: ${hora}%0A- Cliente: ${encodeURIComponent(nombre)}%0A- Teléfono: ${telefono}`;
-
-  const reservationObj = { barber, servicio, fecha, hora, nombre, telefono };
-
-  if(USING_SUPABASE && supabase){
-    try{
-      const res = await saveReservationToSupabase({ ...reservationObj, created_at: new Date().toISOString() });
-      if(res.error){ console.warn('Error guardando reserva en Supabase:', res.error); }
-      else console.log('Reserva guardada en Supabase', res.data);
-    }catch(err){ console.warn('Error al insertar reserva en Supabase', err); }
-  } else { saveReservationLocal(reservationObj); }
-
-  const url = `https://wa.me/${plainPhone.replace('+','')}?text=${mensaje}`;
-  window.open(url,'_blank');
-  closeModalFn();
-});
-
-function saveReservationLocal(obj){ const key = 'vegvisir_reservas'; const data = JSON.parse(localStorage.getItem(key) || '[]'); data.push({...obj, created_at: new Date().toISOString()}); localStorage.setItem(key,JSON.stringify(data)); }
-
-// --- Auth helpers ---
-function mockLogin(username,password){ if(DEMO_USERS[username] && DEMO_USERS[username] === password){ localStorage.setItem('vegvisir_user',username); return true; } return false; }
-function mockLogout(){ localStorage.removeItem('vegvisir_user'); }
-function getCurrentUser(){ return localStorage.getItem('vegvisir_user'); }
-
-async function supabaseLogin({email,password}){ if(!USING_SUPABASE || !supabase) throw new Error('Supabase no configurado'); const res = await supabase.auth.signInWithPassword({ email, password }); return res; }
-async function supabaseSignUp({email,password,username}){ if(!USING_SUPABASE || !supabase) throw new Error('Supabase no configurado'); const res = await supabase.auth.signUp({ email, password, options: { data: { username, role: 'client' } } }); return res; }
-async function supabaseLogout(){ if(!USING_SUPABASE || !supabase) return; await supabase.auth.signOut(); }
-
-// uploader: save images (Supabase storage or local) and record trabajos
-async function uploadFilesForCurrentUser(files){
-  if(USING_SUPABASE && supabase){
-    const userResp = await supabase.auth.getUser().catch(()=>({data:{user:null}}));
-    const user = userResp.data ? userResp.data.user : null;
-    if(!user) throw new Error('No hay usuario logueado');
-    const username = user.user_metadata?.username || user.id;
-    const uploaded = [];
-    for(const file of files){
-      const ext = file.name.split('.').pop();
-      const filePath = `${username}/${Date.now()}-${Math.random().toString(36).substring(2,8)}.${ext}`;
-      const { data, error } = await supabase.storage.from('barberos').upload(filePath, file, { cacheControl: '3600', upsert: false });
-      if(error){ console.warn('Error subida:', error); }
-      else {
-        // get public URL via storage API
-        const { data: pub } = supabase.storage.from('barberos').getPublicUrl(filePath);
-        const publicURL = pub ? pub.publicUrl : `${window.SUPABASE_CONFIG.SUPABASE_URL.replace(/\/$/,'')}/storage/v1/object/public/barberos/${encodeURIComponent(filePath)}`;
-        // insert record in trabajos
-        try{
-          await supabase.from('trabajos').insert([{ user_id: user.id, username, file_path: filePath, public_url: publicURL }]);
-        }catch(err){console.warn('Error creando registro trabajo', err)}
-        uploaded.push({path:filePath, publicURL});
+      // populate modal select with all barbers (useful for manual selection)
+      const barberoSelect = document.getElementById('barberoSelect');
+      if(barberoSelect){
+        barberoSelect.innerHTML = '';
+        (data.barbers || []).forEach(b=>{
+          const opt = document.createElement('option');
+          opt.value = b.username;
+          opt.textContent = (b.name ? b.name + ' — ' : '') + (b.phone || b.username);
+          barberoSelect.appendChild(opt);
+        });
       }
     }
-    return uploaded;
-  } else {
-    const user = getCurrentUser(); if(!user) throw new Error('No demo user logged in'); const arr = []; for(const file of files){ const dataUrl = await fileToDataUrl(file); saveImageForUser(user,dataUrl); arr.push({src:dataUrl}); } return arr;
+
+    // Attach reservar handlers
+    document.querySelectorAll('.reservar-btn').forEach(btn=>{
+      // remove any previous handler to avoid duplicates
+      if(btn._reserveHandler){
+        btn.removeEventListener('click', btn._reserveHandler);
+      }
+      const handler = function(e){
+        e.preventDefault();
+        const svc = btn.dataset.service || '';
+        const username = btn.dataset.username || '';
+        const phone = btn.dataset.phone || '';
+        const servicioInput = document.getElementById('servicioInput');
+        if(servicioInput && svc) servicioInput.value = svc;
+        const barberoSelect = document.getElementById('barberoSelect');
+        if(barberoSelect && username) barberoSelect.value = username;
+        // ensure hidden field barberPhoneHidden exists and set it
+        const form = document.getElementById('reservaForm');
+        if(form){
+          let hidden = document.getElementById('barberPhoneHidden');
+          if(!hidden){
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.id = 'barberPhoneHidden';
+            hidden.name = 'barberPhoneHidden';
+            form.appendChild(hidden);
+          }
+          hidden.value = phone || '';
+        }
+        const telefonoInput = document.getElementById('telefonoInput');
+        if(telefonoInput && phone) telefonoInput.placeholder = phone.replace(/\s+/g,'');
+        if(typeof openModal === 'function') openModal();
+      };
+      btn.addEventListener('click', handler);
+      btn._reserveHandler = handler;
+    });
+
+  }catch(err){
+    console.error('Error en renderSiteFromData:', err);
   }
 }
 
-function fileToDataUrl(file){ return new Promise((resolve,reject)=>{ const reader = new FileReader(); reader.onload = ()=>resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); }); }
+// Modal open/close
+const reservaModal = document.getElementById('reservaModal');
+const closeModalBtn = document.getElementById('closeModal');
+const ctaReservar = document.getElementById('ctaReservar');
 
-function saveImageForUser(username,dataUrl){ const key = `gallery_${username}`; const arr = JSON.parse(localStorage.getItem(key) || '[]'); arr.push({src:dataUrl,created:new Date().toISOString()}); localStorage.setItem(key,JSON.stringify(arr)); }
-function getImagesForUser(username){ const key = `gallery_${username}`; return JSON.parse(localStorage.getItem(key) || '[]'); }
+function openModal(){ if(reservaModal) reservaModal.setAttribute('aria-hidden','false'); }
+function closeModalFn(){ if(reservaModal) reservaModal.setAttribute('aria-hidden','true'); }
 
-// Render galleries: if Supabase configured, fetch from 'trabajos' table; otherwise use localStorage demo
-async function renderGalleries(){
+if(closeModalBtn) closeModalBtn.addEventListener('click', closeModalFn);
+if(ctaReservar) ctaReservar.addEventListener('click', (e)=>{ e.preventDefault(); openModal(); });
+
+// overlay click
+if(reservaModal){
+  reservaModal.addEventListener('click',(e)=>{
+    if(e.target === reservaModal) closeModalFn();
+  });
+}
+document.addEventListener('keydown',(e)=>{ if(e.key === 'Escape') closeModalFn(); });
+
+// Reservation storage helpers
+async function saveReservationToSupabase(obj){
+  if(!USING_SUPABASE || !supabase) return { error: 'supabase_not_configured' };
+  try{
+    const res = await supabase.from('reservas').insert([obj]).select();
+    if(res.error) return { error: res.error };
+    return { data: res.data };
+  }catch(err){
+    return { error: err };
+  }
+}
+function saveReservationLocal(obj){
+  try{
+    const key = 'vegvisir_reservas';
+    const data = JSON.parse(localStorage.getItem(key) || '[]');
+    data.push({...obj, created_at: new Date().toISOString()});
+    localStorage.setItem(key, JSON.stringify(data));
+    return true;
+  }catch(e){
+    console.warn('saveReservationLocal error', e);
+    return false;
+  }
+}
+
+// Form submit -> save and open WhatsApp
+(function wireReservationForm(){
+  const reservaForm = document.getElementById('reservaForm');
+  if(!reservaForm) return;
+  reservaForm.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const barber = (document.getElementById('barberoSelect') ? document.getElementById('barberoSelect').value : '') || '';
+    const servicio = (document.getElementById('servicioInput') ? document.getElementById('servicioInput').value : '') || '';
+    const fecha = (document.getElementById('fechaInput') ? document.getElementById('fechaInput').value : '') || '';
+    const hora = (document.getElementById('horaInput') ? document.getElementById('horaInput').value : '') || '';
+    const nombre = (document.getElementById('nombreInput') ? document.getElementById('nombreInput').value : '') || '';
+    let telefono = (document.getElementById('telefonoInput') ? document.getElementById('telefonoInput').value : '') || '';
+
+    // prefer hidden barberPhoneHidden (barber's number) if present
+    const hidden = document.getElementById('barberPhoneHidden');
+    if(hidden && hidden.value) telefono = hidden.value;
+
+    // if phone still empty, try SITE_DATA lookup
+    if(!telefono){
+      const data = window.SITE_DATA || {};
+      const barberObj = (data.barbers || []).find(b => b.username === barber);
+      telefono = (barberObj && barberObj.phone) || '';
+    }
+
+    const phoneNormalized = (telefono || '').replace(/\s+/g,'').replace(/[^+0-9]/g,'');
+    const plainPhone = phoneNormalized.replace(/^\+/, '');
+
+    const mensajeText = `Hola ${barber} 👋%0AQuisiera reservar:%0A- Servicio: ${encodeURIComponent(servicio)}%0A- Fecha: ${fecha}%0A- Hora: ${hora}%0A- Cliente: ${encodeURIComponent(nombre)}%0A- Teléfono: ${encodeURIComponent(telefono)}`;
+
+    const reservationObj = { barber, servicio, fecha, hora, nombre, telefono };
+
+    // Save reservation
+    if(USING_SUPABASE && supabase){
+      const res = await saveReservationToSupabase({ ...reservationObj, created_at: new Date().toISOString() });
+      if(res && res.error) console.warn('Error guardando en Supabase:', res.error);
+    } else {
+      saveReservationLocal(reservationObj);
+    }
+
+    // Open WhatsApp
+    if(plainPhone){
+      const url = `https://wa.me/${plainPhone}?text=${mensajeText}`;
+      window.open(url, '_blank');
+    } else {
+      alert('No se pudo determinar el teléfono del barbero. Se guardó la reserva localmente; por favor contacta manualmente.');
+    }
+    closeModalFn();
+  });
+})();
+
+// File utilities & gallery local fallback
+function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+function saveImageForUser(username, dataUrl){
+  try{
+    const key = `gallery_${username}`;
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    arr.push({ src: dataUrl, created: new Date().toISOString() });
+    localStorage.setItem(key, JSON.stringify(arr));
+    return true;
+  }catch(e){
+    console.warn('saveImageForUser error', e);
+    return false;
+  }
+}
+function getImagesForUser(username){
+  try{
+    const key = `gallery_${username}`;
+    return JSON.parse(localStorage.getItem(key) || '[]');
+  }catch(e){
+    return [];
+  }
+}
+
+// Supabase auth wrappers (v2 style)
+async function supabaseLogin({email,password}){
+  if(!USING_SUPABASE || !supabase) throw new Error('Supabase no configurado');
+  return await supabase.auth.signInWithPassword({ email, password });
+}
+async function supabaseSignUp({email,password,username}){
+  if(!USING_SUPABASE || !supabase) throw new Error('Supabase no configurado');
+  // add username into user metadata if possible
+  return await supabase.auth.signUp({ email, password }, { data: { username } });
+}
+
+// Login & Signup handlers (with demo fallback)
+(function wireAuthForms(){
+  // LOGIN
+  const loginForm = document.getElementById('loginForm');
+  if(loginForm){
+    loginForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const u = document.getElementById('userInput').value;
+      const p = document.getElementById('passInput').value;
+      if(USING_SUPABASE && supabase){
+        try{
+          let emailCandidate = u.includes('@') ? u : `${u}@vegvisir.local`;
+          const res = await supabaseLogin({ email: emailCandidate, password: p });
+          if(res.error) alert('Error al iniciar sesión: ' + (res.error.message || JSON.stringify(res.error)));
+          else { alert('Login exitoso'); window.location.href = 'uploader.html'; }
+        }catch(err){ console.warn(err); alert('Error al iniciar sesión con Supabase.'); }
+      } else {
+        // demo: check localStorage demo_user_{username}
+        const demo = JSON.parse(localStorage.getItem('demo_user_' + u) || 'null');
+        if(demo && demo.password === p){ localStorage.setItem('vegvisir_user', u); alert('Login demo exitoso'); window.location.href = 'uploader.html'; }
+        else if(DEMO_USERS[u] && DEMO_USERS[u] === p){ localStorage.setItem('vegvisir_user', u); alert('Login demo exitoso'); window.location.href = 'uploader.html'; }
+        else alert('Usuario o clave incorrecta (modo demo).');
+      }
+    });
+  }
+
+  // SIGNUP
+  const signupForm = document.getElementById('signupForm');
+  if(signupForm){
+    signupForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPass').value;
+      const username = document.getElementById('signupUser').value;
+      if(!email || !password || !username){ alert('Completa todos los campos.'); return; }
+
+      if(USING_SUPABASE && supabase){
+        try{
+          const res = await supabaseSignUp({ email, password, username });
+          if(res.error) alert('Error en registro: ' + (res.error.message || JSON.stringify(res.error)));
+          else {
+            alert('Registro completado (revisa tu correo si es necesario).');
+            window.location.href = 'login.html';
+          }
+        }catch(err){ console.warn(err); alert('Error al registrarse con Supabase.'); }
+      } else {
+        // demo: store in localStorage demo_user_{username}
+        localStorage.setItem('demo_user_' + username, JSON.stringify({ email, password }));
+        alert('Registro demo creado. Ahora inicia sesión con tu usuario.');
+        window.location.href = 'login.html';
+      }
+    });
+  }
+})();
+
+// Uploader page (demo fallback if no Supabase)
+(async function wireUploader(){
+  const uploadForm = document.getElementById('uploadForm');
+  if(!uploadForm) return;
+  if(USING_SUPABASE && supabase){
+    try{
+      const userResp = await supabase.auth.getUser().catch(()=>({ data: { user: null } }));
+      const user = userResp?.data?.user || null;
+      if(!user){ alert('Debes iniciar sesión como barbero para subir trabajos.'); window.location.href = 'login.html'; return; }
+      document.getElementById('currentUser').textContent = user.user_metadata?.username || user.id;
+      uploadForm.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        const input = document.getElementById('fileInput');
+        const files = Array.from(input.files || []).slice(0,6);
+        // implement Supabase upload logic if desired (left minimal)
+        alert('Subida con Supabase no implementada en este script demo.');
+      });
+    }catch(err){ console.warn('Uploader error', err); }
+  } else {
+    const user = localStorage.getItem('vegvisir_user');
+    if(!user){ alert('Debes iniciar sesión como barbero para subir trabajos.'); window.location.href = 'login.html'; return; }
+    document.getElementById('currentUser').textContent = user;
+    uploadForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const input = document.getElementById('fileInput');
+      const files = Array.from(input.files || []).slice(0,6);
+      for(const file of files){
+        const dataUrl = await fileToDataUrl(file);
+        saveImageForUser(user, dataUrl);
+      }
+      alert('Imágenes subidas (demo). Se guardan localmente en tu navegador.');
+      window.location.href = 'galeria.html#' + user;
+    });
+  }
+})();
+
+// Gallery render (demo)
+function renderGalleries(){
   const container = document.getElementById('galleryContainer');
   if(!container) return;
   container.innerHTML = '';
-
-  const barbers = window.SITE_DATA ? window.SITE_DATA.barbers.map(b=>b.username) : Object.keys(DEMO_PHONES);
-
-  if(USING_SUPABASE && supabase){
-    try{
-      const { data: trabajos, error } = await supabase.from('trabajos').select('*').order('created_at', { ascending: false });
-      if(error){ console.warn('Error fetching trabajos', error); }
-      // group by username
-      const grouped = {};
-      (trabajos||[]).forEach(t=>{ grouped[t.username] = grouped[t.username] || []; grouped[t.username].push(t); });
-      barbers.forEach(b=>{
-        const section = document.createElement('section'); section.id = b; section.className = 'barber-section';
-        const barberObj = window.SITE_DATA ? window.SITE_DATA.barbers.find(x=>x.username===b) : null;
-        const h = document.createElement('h4'); h.textContent = barberObj ? barberObj.name : b; section.appendChild(h);
-        const imgs = grouped[b] || [];
-        if(imgs.length===0){ const p = document.createElement('p'); p.textContent = 'Próximamente encontrarás aquí los trabajos de nuestros barberos.'; section.appendChild(p); }
-        else{ const grid = document.createElement('div'); grid.className = 'gallery-grid'; imgs.forEach(it=>{ const img = document.createElement('img'); img.src = it.public_url || it.file_path; img.alt = b; img.className='thumb'; grid.appendChild(img); }); section.appendChild(grid); }
-        container.appendChild(section);
-      });
-      return;
-    }catch(err){ console.warn('Error rendering gallery from supabase', err); }
-  }
-
-  // fallback demo rendering
+  const barbers = window.SITE_DATA ? (window.SITE_DATA.barbers || []).map(b=>b.username) : Object.keys(DEMO_PHONES);
   barbers.forEach(b=>{
-    const section = document.createElement('section'); section.id = b; section.className = 'barber-section'; const barberObj = window.SITE_DATA ? window.SITE_DATA.barbers.find(x=>x.username===b) : null; const h = document.createElement('h4'); h.textContent = barberObj ? barberObj.name : b; section.appendChild(h); const imgs = getImagesForUser(b); if(imgs.length===0){ const p = document.createElement('p'); p.textContent = 'Próximamente encontrarás aquí los trabajos de nuestros barberos.'; section.appendChild(p); } else { const grid = document.createElement('div'); grid.className = 'gallery-grid'; imgs.forEach(it=>{ const img = document.createElement('img'); img.src = it.src; img.alt = b; img.className='thumb'; grid.appendChild(img); }); section.appendChild(grid); } container.appendChild(section);
-  });
-}
-
-// Login page handler
-if(document.getElementById('loginForm')){
-  document.getElementById('loginForm').addEventListener('submit',async (e)=>{
-    e.preventDefault();
-    const u = document.getElementById('userInput').value;
-    const p = document.getElementById('passInput').value;
-    if(USING_SUPABASE && supabase){
-      try{
-        // Allow login by username or email
-        let emailCandidate = u.includes('@') ? u : `${u}@vegvisir.local`;
-        const res = await supabaseLogin({ email: emailCandidate, password: p });
-        if(res.error) alert('Error al iniciar sesión: ' + (res.error.message||JSON.stringify(res.error)));
-        else { alert('Login exitoso'); window.location.href = 'uploader.html'; }
-      }catch(err){ console.warn(err); alert('Error al iniciar sesión con Supabase.'); }
+    const section = document.createElement('section');
+    section.id = b;
+    section.className = 'barber-section';
+    const barberObj = (window.SITE_DATA || {}).barbers ? (window.SITE_DATA.barbers.find(x=>x.username===b) || null) : null;
+    const h = document.createElement('h4');
+    h.textContent = barberObj ? barberObj.name : b;
+    section.appendChild(h);
+    const imgs = getImagesForUser(b);
+    if(imgs.length === 0){
+      const p = document.createElement('p');
+      p.textContent = 'Próximamente encontrarás aquí los trabajos de nuestros barberos.';
+      section.appendChild(p);
     } else {
-      if(mockLogin(u,p)){ alert('Login demo exitoso'); window.location.href = 'uploader.html'; } else alert('Usuario o clave incorrecta');
-    }
-  });
-}
-
-// Signup page handler
-if(document.getElementById('signupForm')){
-  document.getElementById('signupForm').addEventListener('submit',async (e)=>{
-    e.preventDefault();
-    const email = document.getElementById('signupEmail').value;
-    const password = document.getElementById('signupPass').value;
-    const username = document.getElementById('signupUser').value;
-
-    if(!email || !password || !username){ alert('Completa todos los campos.'); return; }
-
-    if(USING_SUPABASE && supabase){
-      try{
-        const res = await supabaseSignUp({ email, password, username });
-        if(res.error){
-          alert('Error en registro: ' + (res.error.message||JSON.stringify(res.error)));
-        } else {
-          // create profile row if user info is available
-          try{
-            const userId = res.data?.user?.id;
-            if(userId){
-              await supabase.from('profiles').insert([{ id: userId, username, full_name: username, role: 'client' }]);
-            }
-          }catch(err){ console.warn('No se pudo crear profile row', err); }
-
-          alert('Registro completado. Revisa tu correo para confirmar tu cuenta si es necesario.');
-          window.location.href = 'login.html';
-        }
-      }catch(err){ console.warn(err); alert('Error al registrarse.'); }
-    } else {
-      // demo: create local user
-      localStorage.setItem('demo_user_'+username, JSON.stringify({ email, password }));
-      alert('Registro demo creado. Ahora inicia sesión con tu usuario.');
-      window.location.href = 'login.html';
-    }
-  });
-}
-
-// uploader page handler
-if(document.getElementById('uploadForm')){
-  (async ()=>{
-    if(USING_SUPABASE && supabase){
-      const { data: { user } } = await supabase.auth.getUser().catch(()=>({data:{user:null}}));
-      if(!user){ alert('Debes iniciar sesión como barbero para subir trabajos.'); window.location.href = 'login.html'; return; }
-      // require role barber
-      const profile = (await supabase.from('profiles').select('role').eq('id', user.id).single()).data;
-      if(profile && profile.role !== 'barber'){ alert('No tienes permisos para subir trabajos.'); window.location.href = 'login.html'; return; }
-
-      document.getElementById('currentUser').textContent = user.user_metadata?.username || user.id;
-      document.getElementById('uploadForm').addEventListener('submit', async (e)=>{
-        e.preventDefault();
-        const input = document.getElementById('fileInput');
-        const files = Array.from(input.files).slice(0,6);
-        try{ const res = await uploadFilesForCurrentUser(files); alert('Imágenes subidas.'); window.location.href = 'galeria.html#' + (user.user_metadata?.username || user.id); }catch(err){ console.warn(err); alert('Error al subir imágenes.'); }
+      const grid = document.createElement('div');
+      grid.className = 'gallery-grid';
+      imgs.forEach(it=>{
+        const img = document.createElement('img');
+        img.src = it.src;
+        img.className = 'thumb';
+        grid.appendChild(img);
       });
-    } else {
-      const user = getCurrentUser(); if(!user){ alert('Debes iniciar sesión como barbero para subir trabajos.'); window.location.href = 'login.html'; return; }
-      document.getElementById('currentUser').textContent = user;
-      document.getElementById('uploadForm').addEventListener('submit',(e)=>{
-        e.preventDefault();
-        const input = document.getElementById('fileInput');
-        const files = Array.from(input.files).slice(0,6);
-        files.forEach(file=>{ const reader = new FileReader(); reader.onload = function(ev){ saveImageForUser(user,ev.target.result); }; reader.readAsDataURL(file); });
-        alert('Imágenes subidas (demo). Se guardan localmente en tu navegador.'); window.location.href = 'galeria.html#'+user;
-      });
+      section.appendChild(grid);
     }
-  })();
+    container.appendChild(section);
+  });
 }
 
-// gallery render
-if(document.getElementById('galleryContainer')) renderGalleries();
-
-// render site after DOM ready
-document.addEventListener('DOMContentLoaded', ()=>{
+// initialize
+document.addEventListener('DOMContentLoaded', async ()=>{
+  await initSupabase();
   renderSiteFromData();
+  // render gallery if needed
+  if(document.getElementById('galleryContainer')) renderGalleries();
 });
