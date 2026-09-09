@@ -8,18 +8,19 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
 </head>
-<body>
+<body class="with-bg">
+  <div class="bg-overlay"></div>
   <header class="site-header">
     <div class="container">
       <h1 class="logo">Vegvisir Barber Shop</h1>
       <nav>
         <a href="index.html">Inicio</a>
-        <a href="servicios.html">Servicios</a>
-        <a href="#" id="reservarTop">Reservar</a>
-        <a href="equipo.html">Equipo</a>
+        <a href="#servicios">Servicios</a>
+        <a href="#equipo-home">Equipo</a>
         <a href="galeria.html">Galería</a>
         <a href="contacto.html">Contacto</a>
         <a href="login.html" class="btn small">Entrar</a>
+        <a href="signup.html" class="btn small outline">Registrarse</a>
       </nav>
     </div>
   </header>
@@ -29,69 +30,21 @@
       <div class="container">
         <h2>Estilo y tradición en cada corte</h2>
         <p>Reserva con tu barbero preferido y confirma tu cita por WhatsApp.</p>
-        <a href="#" id="ctaReservar" class="btn">Reservar ahora</a>
+        <a href="#servicios" id="ctaReservar" class="btn">Reservar ahora</a>
       </div>
     </section>
 
     <section class="servicios container" id="servicios">
       <h3>Servicios destacados</h3>
-      <div class="cards">
-        <div class="card">
-          <h4>Corte clásico</h4>
-          <p>Precio: $15 — Duración: 30 min</p>
-          <button class="btn small reservar-btn" data-service="Corte clásico">Reservar</button>
-        </div>
-        <div class="card">
-          <h4>Afeitado premium</h4>
-          <p>Precio: $10 — Duración: 20 min</p>
-          <button class="btn small reservar-btn" data-service="Afeitado premium">Reservar</button>
-        </div>
-        <div class="card">
-          <h4>Barba + corte</h4>
-          <p>Precio: $25 — Duración: 45 min</p>
-          <button class="btn small reservar-btn" data-service="Barba + corte">Reservar</button>
-        </div>
+      <div id="servicesContainer" class="cards">
+        <!-- rendered by scripts.js from site-data.js -->
       </div>
     </section>
 
     <section class="container" id="equipo-home">
       <h3>Nuestro equipo</h3>
-      <div class="team">
-        <div class="member">
-          <img src="https://via.placeholder.com/200" alt="Alejandro">
-          <h4>Alejandro</h4>
-          <p>Especialista en cortes clásicos</p>
-          <button class="btn small reservar-btn" data-barber="alejandro" data-service="Corte clásico">Reservar</button>
-          <a class="btn outline small" href="galeria.html#alejandro">Ver trabajos</a>
-        </div>
-        <div class="member">
-          <img src="https://via.placeholder.com/200" alt="Barbero 2">
-          <h4>Barbero2</h4>
-          <p>Estilos modernos</p>
-          <button class="btn small reservar-btn" data-barber="barbero2">Reservar</button>
-          <a class="btn outline small" href="galeria.html#barbero2">Ver trabajos</a>
-        </div>
-        <div class="member">
-          <img src="https://via.placeholder.com/200" alt="Barbero 3">
-          <h4>Barbero3</h4>
-          <p>Barbas y detalles</p>
-          <button class="btn small reservar-btn" data-barber="barbero3">Reservar</button>
-          <a class="btn outline small" href="galeria.html#barbero3">Ver trabajos</a>
-        </div>
-        <div class="member">
-          <img src="https://via.placeholder.com/200" alt="Barbero 4">
-          <h4>Barbero4</h4>
-          <p>Tendencias</p>
-          <button class="btn small reservar-btn" data-barber="barbero4">Reservar</button>
-          <a class="btn outline small" href="galeria.html#barbero4">Ver trabajos</a>
-        </div>
-        <div class="member">
-          <img src="https://via.placeholder.com/200" alt="Barbero 5">
-          <h4>Barbero5</h4>
-          <p>Acabados</p>
-          <button class="btn small reservar-btn" data-barber="barbero5">Reservar</button>
-          <a class="btn outline small" href="galeria.html#barbero5">Ver trabajos</a>
-        </div>
+      <div id="teamContainer" class="team">
+        <!-- rendered by scripts.js from site-data.js -->
       </div>
     </section>
 
@@ -100,23 +53,18 @@
   <footer class="site-footer">
     <div class="container">
       <p>Vegvisir Barber Shop — Dirección de ejemplo — Horario: Lun-Sab 9:00-19:00</p>
-      <p>Demo: Reserva por WhatsApp. Proyecto en modo prueba.</p>
     </div>
   </footer>
 
-  <!-- Reserva Modal -->
+  <!-- Reserva Modal (keeps same markup) -->
   <div id="reservaModal" class="modal" aria-hidden="true">
     <div class="modal-content">
-      <button class="modal-close" id="closeModal">×</button>
+      <button class="modal-close" id="closeModal" aria-label="Cerrar">×</button>
       <h3>Reservar por WhatsApp</h3>
       <form id="reservaForm">
         <label>Barbero
           <select id="barberoSelect">
-            <option value="alejandro">Alejandro</option>
-            <option value="barbero2">Barbero2</option>
-            <option value="barbero3">Barbero3</option>
-            <option value="barbero4">Barbero4</option>
-            <option value="barbero5">Barbero5</option>
+            <!-- options filled by scripts.js -->
           </select>
         </label>
         <label>Servicio
@@ -141,6 +89,8 @@
     </div>
   </div>
 
+  <script src="site-data.js"></script>
+  <script src="supabase-config.js"></script>
   <script src="scripts.js"></script>
 </body>
 </html>
