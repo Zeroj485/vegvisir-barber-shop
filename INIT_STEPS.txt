@@ -1,57 +1,49 @@
-INIT STEPS — Supabase (quick copy/paste)
-
-1) Crear bucket de Storage (barberos)
-- Entra a tu proyecto en https://app.supabase.com
-- Ve a Storage -> Create new bucket
-  - Bucket name: barberos
-  - Public: YES
-  - Click Create bucket
-
-2) Crear tabla `reservas` (SQL)
-- Ve a SQL Editor -> New query -> pega y ejecuta:
-
-create extension if not exists pgcrypto;
-
-create table if not exists reservas (
-  id uuid primary key default gen_random_uuid(),
-  barber text not null,
-  servicio text,
-  fecha date,
-  hora text,
-  nombre text,
-  telefono text,
-  created_at timestamptz default now()
-);
-
-3) (Opcional) Crear tabla `profiles` para metadata de clientes:
-
-create table if not exists profiles (
-  id uuid primary key references auth.users(id) on delete cascade,
-  username text,
-  full_name text
-);
-
-4) Habilitar sign-ups (si quieres que los clientes se registren):
-- Auth -> Settings -> Enable email signups -> ON
-
-5) Comprobar CORS / policies (mínimo viable):
-- Para comenzar puedes dejar la tabla `reservas` sin RLS. Más adelante recomiendo establecer RLS y políticas más estrictas.
-
-6) Probar la web localmente (con `supabase-config.js` en la raíz del sitio):
-- En la carpeta del repo: python -m http.server 8000
-- Abrir: http://localhost:8000
-- Registrar un cliente (o usar demo) -> hacer una reserva -> comprobar que aparece en la tabla `reservas` (en Supabase -> Table editor -> reservas)
-
-7) Publicar en GitHub Pages (si quieres la web pública):
-- En GitHub -> Repo -> Settings -> Pages -> Source -> branch `main` / folder `/ (root)` -> Save.
-- Tras unos minutos la web estará disponible en https://<tu-usuario>.github.io/vegvisir-barber-shop
-
-NOTAS DE SEGURIDAD
-- El archivo `supabase-config.js` contiene la ANON key (pública). NO pegues ni compartas la `service_role` key.
-- Si prefieres no dejar `supabase-config.js` en el repo, puedes crear ese archivo en tu servidor local o en la raíz del sitio en GitHub Pages utilizando Actions/Secrets para inyectarlo en build.
-
-PIN para uploads (configuración actual)
-- Los barberos pueden subir fotos usando la página de subida protegida por PIN.
-- PIN actual (por defecto): Vegv2026!
-
-Si quieres que yo cree las tablas y el bucket directamente en tu proyecto Supabase, invítame como miembro (Developer) y dime el email con que me invitaste. Actualmente he añadido `supabase-config.js` al repo con las claves que pegaste; eso activa la integración frontend y permite usar Auth/Storage desde el navegador.
+1| INIT STEPS — Supabase (quick copy/paste)
+2| 
+3| 1) Crear bucket de Storage (barberos)
+4| - Entra a tu proyecto en https://app.supabase.com
+5| - Ve a Storage -> Create new bucket
+6|   - Bucket name: barberos
+7|   - Public: YES
+8|   - Click Create bucket
+9| 
+10| 2) Crear/actualizar esquema en la DB (SQL)
+11| - Ve a SQL Editor -> New query -> pega y ejecuta el contenido de DB_SCHEMA.sql (ya incluido en el repo)
+12| - Esto crea/actualiza las tablas reservas, profiles (con role) y trabajos (galería).
+13| 
+14| 3) (Opcional) Crear tabla `profiles` para metadata de clientes (si no se creó antes):
+15| 
+16| create table if not exists profiles (
+17|   id uuid primary key references auth.users(id) on delete cascade,
+18|   username text,
+19|   full_name text,
+20|   role text default 'client'
+21| );
+22| 
+23| 4) Habilitar sign-ups (si quieres que los clientes se registren):
+24| - Auth -> Settings -> Enable email signups -> ON
+25| - Site URL: añade tu URL pública y http://localhost:8000
+26| - Redirect URLs: añade http://localhost:8000 y la URL de Pages
+27| 
+28| 5) Comprobar CORS / policies (mínimo viable):
+29| - Para comenzar puedes dejar la tabla `reservas` sin RLS. Más adelante recomiendo establecer RLS y pol��ticas más estrictas.
+30| - Para `trabajos` y `profiles` recomiendo crear políticas que permitan a los usuarios autenticados insertar sus propios trabajos y leer la galería pública.
+31| 
+32| 6) Probar la web localmente (con `supabase-config.js` en la raíz del sitio):
+33| - En la carpeta del repo: python -m http.server 8000
+34| - Abrir: http://localhost:8000
+35| - Registrar un cliente (o usar demo) -> hacer una reserva -> comprobar que aparece en la tabla `reservas` (en Supabase -> Table editor -> reservas)
+36| 
+37| 7) Publicar en GitHub Pages (si quieres la web pública):
+38| - En GitHub -> Repo -> Settings -> Pages -> Source -> branch `main` / folder `/ (root)` -> Save.
+39| - Tras unos minutos la web estará disponible en https://<tu-usuario>.github.io/vegvisir-barber-shop
+40| 
+41| NOTAS DE SEGURIDAD
+42| - El archivo `supabase-config.js` contiene la ANON key (pública). NO pegues ni compartas la `service_role` key.
+43| - Si prefieres no dejar `supabase-config.js` en el repo, puedes crear ese archivo en tu servidor local o en la raíz del sitio en GitHub Pages utilizando Actions/Secrets para inyectarlo en build.
+44| 
+45| PIN para uploads (configuración actual)
+46| - Los barberos pueden subir fotos usando la página de subida autenticados.
+47| - PIN por defecto fue usado en demos, pero la versión actual usa Auth para control de accesos.
+48| 
+49| Si quieres que yo cree las tablas y el bucket directamente en tu proyecto Supabase, invítame como miembro (Developer) y dime el email con que me invitaste. Actualmente he añadido `supabase-config.js` al repo con la ANON key (pública); la creación de usuarios en lote se hace usando `create_users.js` localmente con la `service_role` key (no compartas la key aqui).

@@ -2,7 +2,7 @@
 // Node script to create barber user accounts and profiles in Supabase using the service_role key.
 // USAGE (run locally):
 //   export SUPABASE_URL="https://qtdfvsoahsezalwnfaly.supabase.co"
-//   export SERVICE_ROLE_KEY="<your service_role key>"
+//   export SERVICE_ROLE_KEY="<your service_role_key_here>"
 //   node create_users.js
 
 const fetch = global.fetch || require('node:fetch');
@@ -35,7 +35,7 @@ async function createUser(user){
       email: user.email,
       password: user.password,
       email_confirm: true,
-      user_metadata: { username: user.username, full_name: user.full_name }
+      user_metadata: { username: user.username, full_name: user.full_name, role: 'barber' }
     })
   });
   const data = await res.json();
@@ -72,7 +72,7 @@ async function createProfile(profile){
   for(const u of users){
     const created = await createUser(u);
     if(created && created.id){
-      await createProfile({ id: created.id, username: u.username, full_name: u.full_name });
+      await createProfile({ id: created.id, username: u.username, full_name: u.full_name, role: 'barber' });
     }
   }
   console.log('Done. Barbero accounts created. Inform users to login with the provided email and password.');

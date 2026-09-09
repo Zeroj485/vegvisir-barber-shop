@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Registrarse - Vegvisir</title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container" style="max-width:520px;margin-top:40px">
+    <h2>Crear cuenta</h2>
+    <p>Regístrate como cliente. Si eres barbero, pide a un administrador que cree tu cuenta.</p>
+    <form id="signupForm" onsubmit="event.preventDefault();">
+      <label>Nombre de usuario
+        <input id="signupUser" placeholder="ej: alejandro" required>
+      </label>
+      <label>Email
+        <input type="email" id="signupEmail" placeholder="tu@email.com" required>
+      </label>
+      <label>Contraseña
+        <input type="password" id="signupPass" required>
+      </label>
+      <div style="text-align:right;margin-top:12px">
+        <button class="btn" type="submit">Crear cuenta</button>
+      </div>
+    </form>
+  </div>
+  <script src="supabase-config.js"></script>
+  <script src="scripts.js"></script>
+</body>
+</html>
