@@ -9,7 +9,8 @@
 <body class="with-bg">
   <div class="bg-overlay"></div>
   <div class="container" style="max-width:520px;margin-top:40px">
-    <div class="auth-card">
+    <div class="auth-card" style="position:relative">
+      <button class="close-auth" aria-label="Cerrar" title="Cerrar" style="position:absolute;right:12px;top:10px;background:transparent;border:0;color:inherit;font-size:26px;line-height:1;cursor:pointer">×</button>
       <h2>Iniciar sesión</h2>
       <form id="loginForm">
         <label>Email o usuario
@@ -27,5 +28,18 @@
   </div>
   <script src="supabase-config.js"></script>
   <script src="scripts.js"></script>
+  <script>
+    // Close/hide the auth card when the user clicks the × button
+    (function(){
+      var btn = document.querySelector('.close-auth');
+      if(!btn) return;
+      btn.addEventListener('click', function(){
+        var card = document.querySelector('.auth-card');
+        if(card) card.style.display = 'none';
+        // optional: navigate back to home
+        // window.location.href = 'index.html';
+      });
+    })();
+  </script>
 </body>
 </html>
