@@ -60,19 +60,11 @@ input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid
 .service-item h4{margin:0 0 6px}
 .service-price{font-weight:800;color:var(--accent)}
 
-/* Pages without the dark background (e.g., login, signup, uploader) */
-body:not(.with-bg){
-  background: #ffffff;
-  color: #0b1220;
-}
-body:not(.with-bg) .container{max-width:720px;padding:28px}
-body:not(.with-bg) .site-header{background:transparent;border-bottom:1px solid rgba(0,0,0,0.06);backdrop-filter:none}
-body:not(.with-bg) .logo{color:var(--accent)}
-body:not(.with-bg) nav a{color:#0b1220}
-body:not(.with-bg) .auth-card, body:not(.with-bg) .container{background:transparent}
-body:not(.with-bg) .auth-card{background:#fff;padding:22px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.08)}
-body:not(.with-bg) label{color:#333}
-body:not(.with-bg) input, body:not(.with-bg) select, body:not(.with-bg) textarea{background:#fff;color:#0b1220;border:1px solid #dcdcdc}
-body:not(.with-bg) .btn{background:var(--accent);color:#fff}
+/* Auth card for forms on top of the background */
+.auth-card{background:rgba(0,0,0,0.45);color:#fff;padding:22px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.08)}
+.auth-card h2{margin-top:0}
+.auth-card label{color:#e6e9ee}
+.auth-card input{background:rgba(255,255,255,0.03);color:#fff;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:8px}
+.auth-card .btn{background:var(--accent);color:#fff}
 
 @media(max-width:760px){.cards{flex-direction:column}.team{justify-content:center}.member{width:46%}.services-list{flex-direction:column}}
