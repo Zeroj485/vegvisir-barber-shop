@@ -6,21 +6,23 @@
   <title>Entrar - Vegvisir</title>
   <link href="styles.css" rel="stylesheet">
 </head>
-<body>
+<body class="auth-page">
   <div class="container" style="max-width:520px;margin-top:40px">
-    <h2>Iniciar sesión</h2>
-    <form id="loginForm" onsubmit="event.preventDefault();">
-      <label>Email o usuario
-        <input id="userInput" placeholder="ej: alejandro@vegvisir.local o alejandro" required>
-      </label>
-      <label>Contraseña
-        <input type="password" id="passInput" required>
-      </label>
-      <div style="text-align:right;margin-top:12px">
-        <button class="btn" type="submit">Entrar</button>
-      </div>
-    </form>
-    <p style="margin-top:14px">¿No tienes cuenta? <a href="signup.html">Regístrate</a></p>
+    <div class="auth-card">
+      <h2>Iniciar sesión</h2>
+      <form id="loginForm">
+        <label>Email o usuario
+          <input id="userInput" placeholder="ej: alejandro@vegvisir.com o alejandro" required>
+        </label>
+        <label>Contraseña
+          <input type="password" id="passInput" required>
+        </label>
+        <div style="text-align:right;margin-top:12px">
+          <button class="btn" type="submit">Entrar</button>
+        </div>
+      </form>
+      <p style="margin-top:14px">¿No tienes cuenta? <a href="signup.html">Regístrate</a></p>
+    </div>
   </div>
   <script src="supabase-config.js"></script>
   <script src="scripts.js"></script>
