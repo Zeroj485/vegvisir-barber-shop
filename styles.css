@@ -51,7 +51,7 @@ nav a.outline{background:transparent;border:1px solid rgba(255,255,255,0.06);pad
 .modal-content{position:relative;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:12px;max-width:520px;width:92%;border:1px solid rgba(255,255,255,0.03)}
 .modal-close{position:absolute;right:12px;top:8px;background:transparent;border:0;font-size:28px;color:var(--text);cursor:pointer}
 label{display:block;margin:10px 0;color:var(--muted)}
-input,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
+input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
 .modal-actions{text-align:right;margin-top:12px}
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
 .thumb{width:100%;height:120px;object-fit:cover;border-radius:6px}
@@ -59,4 +59,20 @@ input,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255
 .service-item{background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;min-width:200px;border:1px solid rgba(255,255,255,0.03)}
 .service-item h4{margin:0 0 6px}
 .service-price{font-weight:800;color:var(--accent)}
+
+/* Pages without the dark background (e.g., login, signup, uploader) */
+body:not(.with-bg){
+  background: #ffffff;
+  color: #0b1220;
+}
+body:not(.with-bg) .container{max-width:720px;padding:28px}
+body:not(.with-bg) .site-header{background:transparent;border-bottom:1px solid rgba(0,0,0,0.06);backdrop-filter:none}
+body:not(.with-bg) .logo{color:var(--accent)}
+body:not(.with-bg) nav a{color:#0b1220}
+body:not(.with-bg) .auth-card, body:not(.with-bg) .container{background:transparent}
+body:not(.with-bg) .auth-card{background:#fff;padding:22px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.08)}
+body:not(.with-bg) label{color:#333}
+body:not(.with-bg) input, body:not(.with-bg) select, body:not(.with-bg) textarea{background:#fff;color:#0b1220;border:1px solid #dcdcdc}
+body:not(.with-bg) .btn{background:var(--accent);color:#fff}
+
 @media(max-width:760px){.cards{flex-direction:column}.team{justify-content:center}.member{width:46%}.services-list{flex-direction:column}}
