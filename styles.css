@@ -60,11 +60,13 @@ input,select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid
 .service-item h4{margin:0 0 6px}
 .service-price{font-weight:800;color:var(--accent)}
 
-/* Auth card for forms on top of the background: use white card with black text for signup/login */
-.auth-card{background:rgba(255,255,255,0.96);color:#0b1220;padding:22px;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.06)}
-.auth-card h2{margin-top:0}
-.auth-card label{color:#0b1220}
-.auth-card input{background:#fff;color:#0b1220;border:1px solid #dcdcdc;padding:10px;border-radius:8px}
+/* Auth card for forms on top of the background: darker translucent card for higher contrast */
+.auth-card{background:rgba(0,0,0,0.65);color:#ffffff;padding:22px;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04)}
+.auth-card h2{margin-top:0;color:#fff}
+.auth-card p{color:#e6e9ee}
+.auth-card label{color:#e6e9ee}
+.auth-card input{background:rgba(255,255,255,0.04);color:#fff;border:1px solid rgba(255,255,255,0.06);padding:10px;border-radius:8px}
+.auth-card ::placeholder{color:rgba(255,255,255,0.7);opacity:1}
 .auth-card .btn{background:var(--accent);color:#fff}
 
 @media(max-width:760px){.cards{flex-direction:column}.team{justify-content:center}.member{width:46%}.services-list{flex-direction:column}}
