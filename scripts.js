@@ -201,7 +201,7 @@ function saveReservationLocal(obj){
     const phoneNormalized = (telefono || '').replace(/\s+/g,'').replace(/[^+0-9]/g,'');
     const plainPhone = phoneNormalized.replace(/^\+/, '');
 
-    const mensajeText = `Hola ${barber} 👋%0AQuisiera reservar:%0A- Servicio: ${encodeURIComponent(servicio)}%0A- Fecha: ${fecha}%0A- Hora: ${hora}%0A- Cliente: ${encodeURIComponent(nombre)}%0A- Teléfono: ${encodeURIComponent(telefono)}`;
+    const mensajeText = `Hola ${barber} 👋%0AQuisiera reservar:%0A- Servicio: ${encodeURIComponent(servicio)}%0A- Fecha: ${fecha}%0A- Hora: ${hora}%0A- Cliente: ${encodeURIComponent(nombre)}%0A[...]`;
 
     const reservationObj = { barber, servicio, fecha, hora, nombre, telefono };
 
@@ -389,6 +389,13 @@ function renderGalleries(){
     container.appendChild(section);
   });
 }
+
+// Close auth buttons: redirect to home (handle clicks for any .close-auth)
+document.addEventListener('click', function(e){
+  if(!e.target.matches('.close-auth')) return;
+  // Redirect to home page when user clicks the × button
+  window.location.href = 'index.html';
+});
 
 // initialize
 document.addEventListener('DOMContentLoaded', async ()=>{
