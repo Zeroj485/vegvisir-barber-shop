@@ -1,6 +1,4 @@
-/* styles.css — updated to use Vegvisir background and a high-contrast monochrome theme that matches the uploaded logo/bg
-   - Expects a background image at assets/vegvisir-bg.jpg (or .png). If you want me to add the exact image file to the repo, súbela o dime y la añado.
-*/
+/* styles.css — updated to use Vegvisir background at repo root and a high-contrast monochrome theme */
 :root{
   --bg-overlay-color: rgba(3,6,10,0.72);
   --bg:#08090a; /* fallback solid background */
@@ -15,8 +13,8 @@ html,body{height:100%}
 body{
   margin:0;font-family:Inter,system-ui,Arial,sans-serif;color:var(--text);
   background-color:var(--bg);
-  /* background image: replace assets/vegvisir-bg.jpg with the file you uploaded */
-  background-image: url('assets/vegvisir-bg.jpg');
+  /* background image: using vegvisir-bg.jpeg located at repo root */
+  background-image: url('vegvisir-bg.jpeg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
